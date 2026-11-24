@@ -87,6 +87,12 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
             com.sshborg.data.AppPreferences.DOUBLE_TAP_NONE,
         )
 
+    val volumeKeysFontSize: StateFlow<Boolean> =
+        prefs.volumeKeysFontSize.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val swipeSwitchSessions: StateFlow<Boolean> =
+        prefs.swipeSwitchSessions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
@@ -220,6 +226,14 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setDoubleTapAction(action: Int) {
         viewModelScope.launch { prefs.setDoubleTapAction(action) }
+    }
+
+    fun setVolumeKeysFontSize(enabled: Boolean) {
+        viewModelScope.launch { prefs.setVolumeKeysFontSize(enabled) }
+    }
+
+    fun setSwipeSwitchSessions(enabled: Boolean) {
+        viewModelScope.launch { prefs.setSwipeSwitchSessions(enabled) }
     }
 
     fun setTerminalColorScheme(scheme: Int) {

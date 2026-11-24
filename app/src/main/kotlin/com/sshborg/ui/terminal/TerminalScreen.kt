@@ -124,6 +124,8 @@ fun TerminalScreen(
     val doubleTapAction by app.appPreferences.doubleTapAction.collectAsState(
         initial = AppPreferences.DOUBLE_TAP_NONE
     )
+    val volumeKeysFontSize by app.appPreferences.volumeKeysFontSize.collectAsState(initial = true)
+    val swipeSwitchSessions by app.appPreferences.swipeSwitchSessions.collectAsState(initial = true)
     val nightMode     by app.appPreferences.nightMode.collectAsState(
         initial = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     )
@@ -389,6 +391,9 @@ fun TerminalScreen(
                             view.fontSizeSp            = fontSize.toFloat()
                             view.invertScroll          = invertScroll
                             view.doubleTapAction       = doubleTapAction
+                            view.volumeKeysFontSize    = volumeKeysFontSize
+                            view.swipeSwitchSessions   = swipeSwitchSessions
+                            view.onSessionSwipe        = { dir -> switchSessionBySwipe(dir, sessionId, allShellSessions, onSwitchSession) }
                             view.keepScreenOn          = keepScreenOn
                             view.lightScheme           = terminalLight
                             view.onInput              = sendInput
@@ -405,6 +410,9 @@ fun TerminalScreen(
                         view.fontSizeSp            = fontSize.toFloat()
                         view.invertScroll          = invertScroll
                         view.doubleTapAction       = doubleTapAction
+                        view.volumeKeysFontSize    = volumeKeysFontSize
+                        view.swipeSwitchSessions   = swipeSwitchSessions
+                        view.onSessionSwipe        = { dir -> switchSessionBySwipe(dir, sessionId, allShellSessions, onSwitchSession) }
                         view.keepScreenOn          = keepScreenOn
                         view.lightScheme           = terminalLight
                         view.onInput              = sendInput
@@ -704,6 +712,19 @@ fun TerminalScreen(
             }
         }
     }
+}
+
+/** Maps a horizontal swipe to the neighboring shell session, browser-style: left = next, right = previous. */
+private fun switchSessionBySwipe(
+    dir: Int,
+    currentId: String,
+    sessions: List<SessionManager.ActiveSession>,
+    onSwitch: (String) -> Unit,
+) {
+    if (sessions.size < 2) return
+    val idx = sessions.indexOfFirst { it.id == currentId }
+    if (idx < 0) return
+    onSwitch(sessions[(idx - dir).mod(sessions.size)].id)
 }
 
 @Composable

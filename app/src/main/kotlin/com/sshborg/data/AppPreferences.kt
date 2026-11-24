@@ -39,6 +39,8 @@ class AppPreferences(private val context: Context) {
         val TERMINAL_HIDE_STATUS_BAR  = booleanPreferencesKey("terminal_hide_status_bar")
         val TERMINAL_COLOR_SCHEME     = intPreferencesKey("terminal_color_scheme")
         val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
+        val VOLUME_KEYS_FONT_SIZE     = booleanPreferencesKey("volume_keys_font_size")
+        val SWIPE_SWITCH_SESSIONS     = booleanPreferencesKey("swipe_switch_sessions")
         val SFTP_SORT_DIRS_FIRST      = booleanPreferencesKey("sftp_sort_dirs_first")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
@@ -206,6 +208,22 @@ class AppPreferences(private val context: Context) {
 
     suspend fun setDoubleTapAction(action: Int) {
         context.dataStore.edit { it[Keys.DOUBLE_TAP_ACTION] = action }
+    }
+
+    /** Volume up/down adjust the terminal font size instead of the system volume. Default true. */
+    val volumeKeysFontSize: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.VOLUME_KEYS_FONT_SIZE] ?: true }
+
+    suspend fun setVolumeKeysFontSize(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.VOLUME_KEYS_FONT_SIZE] = enabled }
+    }
+
+    /** A horizontal fling on the terminal switches to the next/previous open session. Default true. */
+    val swipeSwitchSessions: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.SWIPE_SWITCH_SESSIONS] ?: true }
+
+    suspend fun setSwipeSwitchSessions(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.SWIPE_SWITCH_SESSIONS] = enabled }
     }
 
     companion object {
@@ -461,6 +479,8 @@ class AppPreferences(private val context: Context) {
             put("suggestions_bar_sticky", p[Keys.SUGGESTIONS_BAR_STICKY] ?: false)
             put("extra_keys_bar_pinned",  p[Keys.EXTRA_KEYS_BAR_PINNED] ?: false)
             put("double_tap_action",      p[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE)
+            put("volume_keys_font_size",  p[Keys.VOLUME_KEYS_FONT_SIZE] ?: true)
+            put("swipe_switch_sessions",  p[Keys.SWIPE_SWITCH_SESSIONS] ?: true)
             put("host_sort_mode",         p[Keys.HOST_SORT_MODE] ?: HOST_SORT_ALPHA)
             put("extra_bar_selected",     p[Keys.EXTRA_BAR_SELECTED] ?: ExtraBarPresets.STANDARD)
             put("extra_bar_custom",       org.json.JSONArray(ExtraBarJson.encodeAll(
@@ -489,6 +509,8 @@ class AppPreferences(private val context: Context) {
             if (obj.has("suggestions_bar_sticky")) p[Keys.SUGGESTIONS_BAR_STICKY] = obj.getBoolean("suggestions_bar_sticky")
             if (obj.has("extra_keys_bar_pinned"))  p[Keys.EXTRA_KEYS_BAR_PINNED] = obj.getBoolean("extra_keys_bar_pinned")
             if (obj.has("double_tap_action"))      p[Keys.DOUBLE_TAP_ACTION] = obj.getInt("double_tap_action").coerceIn(DOUBLE_TAP_NONE, DOUBLE_TAP_TAB_TWICE)
+            if (obj.has("volume_keys_font_size"))  p[Keys.VOLUME_KEYS_FONT_SIZE] = obj.getBoolean("volume_keys_font_size")
+            if (obj.has("swipe_switch_sessions"))  p[Keys.SWIPE_SWITCH_SESSIONS] = obj.getBoolean("swipe_switch_sessions")
             // Custom bars replace the local set (they carry their own ids); a selected id that
             // resolves to nothing falls back to the standard preset at read time.
             val customBars = obj.optJSONArray("extra_bar_custom")?.toString()

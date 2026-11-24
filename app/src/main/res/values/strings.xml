@@ -220,6 +220,10 @@
 
     <string name="settings_invert_scroll_title">Invert terminal scroll</string>
     <string name="settings_invert_scroll_subtitle">Swipe up to see older output instead of newer</string>
+    <string name="settings_volume_keys_font_size_title">Volume keys change font size</string>
+    <string name="settings_volume_keys_font_size_subtitle">In the terminal, volume up/down grows or shrinks the text instead of changing the system volume</string>
+    <string name="settings_swipe_sessions_title">Swipe to switch sessions</string>
+    <string name="settings_swipe_sessions_subtitle">Swipe left or right on the terminal to move to the next or previous open session</string>
     <string name="settings_sftp_dirs_first_title">Folders before files</string>
     <string name="settings_sftp_dirs_first_subtitle">In the SFTP browser, list folders before files</string>
     <string name="settings_double_tap_title">Double-tap action</string>

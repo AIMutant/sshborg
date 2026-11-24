@@ -80,6 +80,15 @@ class TerminalView @JvmOverloads constructor(
      */
     var onTapConfirmed: (() -> Unit)? = null
 
+    /** Volume up/down grow or shrink the text instead of changing the system volume. */
+    var volumeKeysFontSize: Boolean = true
+
+    /** A clearly horizontal fling asks the screen to switch sessions, via [onSessionSwipe]. */
+    var swipeSwitchSessions: Boolean = true
+
+    /** Called with +1 for a rightward fling, -1 for a leftward one. */
+    var onSessionSwipe: ((Int) -> Unit)? = null
+
     /**
      * Default font size from settings. Applied as long as the user hasn't pinch-zoomed:
      * once they do, the pinched size takes over for the rest of the session.
@@ -869,6 +878,23 @@ class TerminalView @JvmOverloads constructor(
             if (event.repeatCount == 0) showKeyboard()
             return true
         }
+        // Volume keys resize the text while this is on; consumed, so the system volume
+        // does not move. Once the keys have sized the text it counts as a user zoom and
+        // no longer tracks the default font size setting.
+        if (volumeKeysFontSize &&
+            (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+        ) {
+            val sp = textPaint.textSize / resources.displayMetrics.scaledDensity
+            val step = if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) 1f else -1f
+            userScaled = true
+            setTextSizeSp(
+                (sp + step).coerceIn(
+                    AppPreferences.MIN_TERMINAL_FONT_SIZE.toFloat(),
+                    AppPreferences.MAX_TERMINAL_FONT_SIZE.toFloat(),
+                )
+            )
+            return true
+        }
         val bytes = keyEventToBytes(keyCode, event) ?: return super.onKeyDown(keyCode, event)
         emitInput(bytes)
         return true
@@ -947,6 +973,15 @@ class TerminalView @JvmOverloads constructor(
         }
         override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             if (inSelectionMode) return false
+            // A clearly horizontal fling switches sessions instead of scrolling the history;
+            // the screen maps the sign to its tab order (browser-style: left = next).
+            if (swipeSwitchSessions &&
+                abs(velocityX) > abs(velocityY) &&
+                abs(velocityX) > MIN_SWIPE_VELOCITY
+            ) {
+                onSessionSwipe?.invoke(if (velocityX > 0f) 1 else -1)
+                return true
+            }
             val emu = emulator ?: return false
             // Match onScroll's sign convention so momentum continues the drag direction.
             val v = if (invertScroll) -velocityY else velocityY
@@ -1200,6 +1235,9 @@ class TerminalView @JvmOverloads constructor(
 
         /** Lines of local scrollback per notch of a real wheel — the usual desktop step. */
         private const val LOCAL_WHEEL_LINES = 3
+
+        /** Minimum horizontal fling velocity (px/s) that counts as a session-switch swipe. */
+        private const val MIN_SWIPE_VELOCITY = 800f
 
         /** Virtual span of a reported-wheel fling; caps how far one flick can carry. */
         private const val WHEEL_FLING_MAX_LINES = 400

@@ -81,6 +81,8 @@ fun SettingsScreen(
     val terminalHideStatusBar by vm.terminalHideStatusBar.collectAsState()
     val terminalColorScheme   by vm.terminalColorScheme.collectAsState()
     val doubleTapAction       by vm.doubleTapAction.collectAsState()
+    val volumeKeysFontSize    by vm.volumeKeysFontSize.collectAsState()
+    val swipeSwitchSessions   by vm.swipeSwitchSessions.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
@@ -306,6 +308,28 @@ fun SettingsScreen(
                     Switch(
                         checked = invertTerminalScroll,
                         onCheckedChange = { vm.setInvertTerminalScroll(it) },
+                    )
+                },
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_volume_keys_font_size_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_volume_keys_font_size_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = volumeKeysFontSize,
+                        onCheckedChange = { vm.setVolumeKeysFontSize(it) },
+                    )
+                },
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_swipe_sessions_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_swipe_sessions_subtitle)) },
+                trailingContent = {
+                    Switch(
+                        checked = swipeSwitchSessions,
+                        onCheckedChange = { vm.setSwipeSwitchSessions(it) },
                     )
                 },
             )

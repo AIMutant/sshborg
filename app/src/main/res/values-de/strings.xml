@@ -209,6 +209,10 @@
 
     <string name="settings_invert_scroll_title">Terminal-Scrollen umkehren</string>
     <string name="settings_invert_scroll_subtitle">Nach oben wischen für ältere Ausgabe</string>
+    <string name="settings_volume_keys_font_size_title">Lautstärketasten ändern die Schriftgröße</string>
+    <string name="settings_volume_keys_font_size_subtitle">Im Terminal vergrößern/verkleinern die Lautstärketasten den Text statt die Systemlautstärke zu ändern</string>
+    <string name="settings_swipe_sessions_title">Wischen wechselt die Sitzung</string>
+    <string name="settings_swipe_sessions_subtitle">Nach links oder rechts wischen im Terminal, um zur nächsten bzw. vorherigen offenen Sitzung zu wechseln</string>
     <string name="settings_sftp_dirs_first_title">Ordner vor Dateien</string>
     <string name="settings_sftp_dirs_first_subtitle">Im SFTP-Browser Ordner vor Dateien auflisten</string>
     <string name="settings_double_tap_title">Doppeltipp-Aktion</string>
