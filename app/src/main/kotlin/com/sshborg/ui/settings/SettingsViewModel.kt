@@ -90,8 +90,11 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     val volumeKeysFontSize: StateFlow<Boolean> =
         prefs.volumeKeysFontSize.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    val swipeSwitchSessions: StateFlow<Boolean> =
-        prefs.swipeSwitchSessions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val swipeAction: StateFlow<Int> =
+        prefs.swipeAction.stateIn(
+            viewModelScope, SharingStarted.WhileSubscribed(5000),
+            com.sshborg.data.AppPreferences.SWIPE_SCREEN_NEXT_PREV,
+        )
 
     val historySuggestions: StateFlow<Boolean> =
         prefs.historySuggestions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
@@ -232,8 +235,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { prefs.setVolumeKeysFontSize(enabled) }
     }
 
-    fun setSwipeSwitchSessions(enabled: Boolean) {
-        viewModelScope.launch { prefs.setSwipeSwitchSessions(enabled) }
+    fun setSwipeAction(action: Int) {
+        viewModelScope.launch { prefs.setSwipeAction(action) }
     }
 
     fun setTerminalColorScheme(scheme: Int) {

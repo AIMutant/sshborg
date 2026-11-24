@@ -82,7 +82,7 @@ fun SettingsScreen(
     val terminalColorScheme   by vm.terminalColorScheme.collectAsState()
     val doubleTapAction       by vm.doubleTapAction.collectAsState()
     val volumeKeysFontSize    by vm.volumeKeysFontSize.collectAsState()
-    val swipeSwitchSessions   by vm.swipeSwitchSessions.collectAsState()
+    val swipeAction           by vm.swipeAction.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
@@ -323,13 +323,22 @@ fun SettingsScreen(
                 },
             )
 
+            // Swipe left/right action picker
+            val swipeOptions = listOf(
+                AppPreferences.SWIPE_OFF to stringResource(R.string.settings_swipe_action_off),
+                AppPreferences.SWIPE_SCREEN_NEXT_PREV to stringResource(R.string.settings_swipe_action_screen),
+                AppPreferences.SWIPE_SESSION to stringResource(R.string.settings_swipe_action_session),
+            )
             ListItem(
-                headlineContent = { Text(stringResource(R.string.settings_swipe_sessions_title)) },
-                supportingContent = { Text(stringResource(R.string.settings_swipe_sessions_subtitle)) },
+                headlineContent = { Text(stringResource(R.string.settings_swipe_action_title)) },
+                supportingContent = { Text(stringResource(R.string.settings_swipe_action_subtitle)) },
                 trailingContent = {
-                    Switch(
-                        checked = swipeSwitchSessions,
-                        onCheckedChange = { vm.setSwipeSwitchSessions(it) },
+                    SettingSelect(
+                        label = stringResource(R.string.settings_swipe_action_title),
+                        selected = swipeAction,
+                        options = swipeOptions,
+                        onSelect = { vm.setSwipeAction(it) },
+                        touchless = touchless,
                     )
                 },
             )

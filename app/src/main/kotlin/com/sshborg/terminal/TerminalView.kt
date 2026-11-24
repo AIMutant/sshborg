@@ -56,6 +56,10 @@ class TerminalView @JvmOverloads constructor(
     // (dy / cellH) to whole lines every event discarded the fraction, so slow drags
     // never accumulated enough to move and felt laggy/dropped. Carry it across events.
     private var scrollRemainderY = 0f
+    // Horizontal-swipe accumulators: a swipe counts once the drag is clearly horizontal
+    // and has travelled a quarter of the screen, so slow deliberate swipes work too.
+    private var swipeAccumX = 0f
+    private var swipeAccumY = 0f
 
     // Wheel-report accumulators: one for travel in lines (finger drag or momentum), one for a
     // real wheel's notches (fractional on precision mice). Both convert into whole notches.
@@ -83,8 +87,8 @@ class TerminalView @JvmOverloads constructor(
     /** Volume up/down grow or shrink the text instead of changing the system volume. */
     var volumeKeysFontSize: Boolean = true
 
-    /** A clearly horizontal fling asks the screen to switch sessions, via [onSessionSwipe]. */
-    var swipeSwitchSessions: Boolean = true
+    /** What a horizontal swipe on the terminal does: one of AppPreferences.SWIPE_*. */
+    var swipeAction: Int = AppPreferences.SWIPE_SCREEN_NEXT_PREV
 
     /** Called with +1 for a rightward fling, -1 for a leftward one. */
     var onSessionSwipe: ((Int) -> Unit)? = null
@@ -832,6 +836,21 @@ class TerminalView @JvmOverloads constructor(
      * (the live prompt), like every standard terminal — otherwise typing while scrolled
      * up in the history happens off-screen. Server output does NOT trigger this.
      */
+    /**
+     * Fires the configured swipe action. [dir] is +1 for a rightward, -1 for a leftward swipe.
+     * Left = "next", browser-tab style, for both actions below.
+     */
+    private fun fireSwipe(dir: Int) {
+        when (swipeAction) {
+            AppPreferences.SWIPE_SESSION ->
+                onSessionSwipe?.invoke(dir)
+            AppPreferences.SWIPE_SCREEN_NEXT_PREV ->
+                // GNU screen: Ctrl+A then n (next window) / p (previous window).
+                emitInput(if (dir < 0) byteArrayOf(0x01, 'n'.code.toByte()) else byteArrayOf(0x01, 'p'.code.toByte()))
+            else -> {}
+        }
+    }
+
     private fun emitInput(bytes: ByteArray) {
         if (scrollbackOffset != 0) {
             cancelFling()
@@ -967,19 +986,20 @@ class TerminalView @JvmOverloads constructor(
             // previous drag can't nudge the view on the next touch-down.
             scrollRemainderY = 0f
             wheelTravel = 0f
+            swipeAccumX = 0f
+            swipeAccumY = 0f
             // A new touch stops any in-flight momentum (tap-to-halt, like a scroll view).
             cancelFling()
             return true
         }
         override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             if (inSelectionMode) return false
-            // A clearly horizontal fling switches sessions instead of scrolling the history;
-            // the screen maps the sign to its tab order (browser-style: left = next).
-            if (swipeSwitchSessions &&
+            // A clearly horizontal fling fires the swipe action instead of scrolling.
+            if (swipeAction != AppPreferences.SWIPE_OFF &&
                 abs(velocityX) > abs(velocityY) &&
                 abs(velocityX) > MIN_SWIPE_VELOCITY
             ) {
-                onSessionSwipe?.invoke(if (velocityX > 0f) 1 else -1)
+                fireSwipe(if (velocityX > 0f) 1 else -1)
                 return true
             }
             val emu = emulator ?: return false
@@ -991,6 +1011,19 @@ class TerminalView @JvmOverloads constructor(
         override fun onScroll(e1: MotionEvent?, e2: MotionEvent, dx: Float, dy: Float): Boolean {
             val emu = emulator ?: return false
             if (cellH <= 0f) return false
+            // Horizontal swipe: once the drag is clearly horizontal and long enough, fire the
+            // action and swallow the gesture, so it does not also scroll the history.
+            swipeAccumX += dx
+            swipeAccumY += dy
+            val swipeThreshold = if (width > 0) width * 0.25f else 300f
+            if (swipeAction != AppPreferences.SWIPE_OFF && !inSelectionMode &&
+                abs(swipeAccumX) > abs(swipeAccumY) && abs(swipeAccumX) > swipeThreshold
+            ) {
+                fireSwipe(if (swipeAccumX < 0f) -1 else 1)
+                swipeAccumX = 0f
+                swipeAccumY = 0f
+                return true
+            }
             scrollRemainderY += if (invertScroll) dy else -dy
             val lines = (scrollRemainderY / cellH).toInt()
             if (lines != 0) {

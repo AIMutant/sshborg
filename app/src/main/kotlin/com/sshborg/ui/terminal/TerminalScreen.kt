@@ -125,7 +125,7 @@ fun TerminalScreen(
         initial = AppPreferences.DOUBLE_TAP_NONE
     )
     val volumeKeysFontSize by app.appPreferences.volumeKeysFontSize.collectAsState(initial = true)
-    val swipeSwitchSessions by app.appPreferences.swipeSwitchSessions.collectAsState(initial = true)
+    val swipeAction by app.appPreferences.swipeAction.collectAsState(initial = AppPreferences.SWIPE_SCREEN_NEXT_PREV)
     val nightMode     by app.appPreferences.nightMode.collectAsState(
         initial = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     )
@@ -392,7 +392,7 @@ fun TerminalScreen(
                             view.invertScroll          = invertScroll
                             view.doubleTapAction       = doubleTapAction
                             view.volumeKeysFontSize    = volumeKeysFontSize
-                            view.swipeSwitchSessions   = swipeSwitchSessions
+                            view.swipeAction           = swipeAction
                             view.onSessionSwipe        = { dir -> switchSessionBySwipe(dir, sessionId, allShellSessions, onSwitchSession) }
                             view.keepScreenOn          = keepScreenOn
                             view.lightScheme           = terminalLight
@@ -411,7 +411,7 @@ fun TerminalScreen(
                         view.invertScroll          = invertScroll
                         view.doubleTapAction       = doubleTapAction
                         view.volumeKeysFontSize    = volumeKeysFontSize
-                        view.swipeSwitchSessions   = swipeSwitchSessions
+                        view.swipeAction           = swipeAction
                         view.onSessionSwipe        = { dir -> switchSessionBySwipe(dir, sessionId, allShellSessions, onSwitchSession) }
                         view.keepScreenOn          = keepScreenOn
                         view.lightScheme           = terminalLight
