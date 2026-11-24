@@ -41,6 +41,8 @@ class AppPreferences(private val context: Context) {
         val DOUBLE_TAP_ACTION         = intPreferencesKey("double_tap_action")
         val VOLUME_KEYS_FONT_SIZE     = booleanPreferencesKey("volume_keys_font_size")
         val SWIPE_ACTION              = intPreferencesKey("swipe_action")
+        val SWIPE_CUSTOM_NEXT         = stringPreferencesKey("swipe_custom_next")
+        val SWIPE_CUSTOM_PREV         = stringPreferencesKey("swipe_custom_prev")
         val SFTP_SORT_DIRS_FIRST      = booleanPreferencesKey("sftp_sort_dirs_first")
         val HISTORY_SUGGESTIONS          = booleanPreferencesKey("history_suggestions")
         val SUGGESTIONS_BAR_STICKY       = booleanPreferencesKey("suggestions_bar_sticky")
@@ -227,7 +229,25 @@ class AppPreferences(private val context: Context) {
         context.dataStore.data.map { it[Keys.SWIPE_ACTION] ?: SWIPE_SCREEN_NEXT_PREV }
 
     suspend fun setSwipeAction(action: Int) {
-        context.dataStore.edit { it[Keys.SWIPE_ACTION] = action.coerceIn(SWIPE_OFF, SWIPE_SESSION) }
+        context.dataStore.edit { it[Keys.SWIPE_ACTION] = action.coerceIn(SWIPE_OFF, SWIPE_CUSTOM) }
+    }
+
+    /**
+     * Key sequences sent on a left/right swipe when [swipeAction] is [SWIPE_CUSTOM]. Escapes
+     * follow the extra-bar text keys (\\n \\t \\e \\\\ \\xHH); defaults are Ctrl+A n / Ctrl+A p.
+     */
+    val swipeCustomNext: Flow<String> =
+        context.dataStore.data.map { it[Keys.SWIPE_CUSTOM_NEXT] ?: "\\x01n" }
+
+    suspend fun setSwipeCustomNext(s: String) {
+        context.dataStore.edit { it[Keys.SWIPE_CUSTOM_NEXT] = s }
+    }
+
+    val swipeCustomPrev: Flow<String> =
+        context.dataStore.data.map { it[Keys.SWIPE_CUSTOM_PREV] ?: "\\x01p" }
+
+    suspend fun setSwipeCustomPrev(s: String) {
+        context.dataStore.edit { it[Keys.SWIPE_CUSTOM_PREV] = s }
     }
 
     companion object {
@@ -257,6 +277,8 @@ class AppPreferences(private val context: Context) {
         const val SWIPE_OFF = 0
         const val SWIPE_SCREEN_NEXT_PREV = 1
         const val SWIPE_SESSION = 2
+        const val SWIPE_TMUX_NEXT_PREV = 3
+        const val SWIPE_CUSTOM = 4
 
         // App-lock modes (see [lockMode]).
         const val LOCK_NONE = 0       // no lock (default)
@@ -489,6 +511,8 @@ class AppPreferences(private val context: Context) {
             put("double_tap_action",      p[Keys.DOUBLE_TAP_ACTION] ?: DOUBLE_TAP_NONE)
             put("volume_keys_font_size",  p[Keys.VOLUME_KEYS_FONT_SIZE] ?: true)
             put("swipe_action",           p[Keys.SWIPE_ACTION] ?: SWIPE_SCREEN_NEXT_PREV)
+            put("swipe_custom_next",      p[Keys.SWIPE_CUSTOM_NEXT] ?: "\\x01n")
+            put("swipe_custom_prev",      p[Keys.SWIPE_CUSTOM_PREV] ?: "\\x01p")
             put("host_sort_mode",         p[Keys.HOST_SORT_MODE] ?: HOST_SORT_ALPHA)
             put("extra_bar_selected",     p[Keys.EXTRA_BAR_SELECTED] ?: ExtraBarPresets.STANDARD)
             put("extra_bar_custom",       org.json.JSONArray(ExtraBarJson.encodeAll(
@@ -518,7 +542,9 @@ class AppPreferences(private val context: Context) {
             if (obj.has("extra_keys_bar_pinned"))  p[Keys.EXTRA_KEYS_BAR_PINNED] = obj.getBoolean("extra_keys_bar_pinned")
             if (obj.has("double_tap_action"))      p[Keys.DOUBLE_TAP_ACTION] = obj.getInt("double_tap_action").coerceIn(DOUBLE_TAP_NONE, DOUBLE_TAP_TAB_TWICE)
             if (obj.has("volume_keys_font_size"))  p[Keys.VOLUME_KEYS_FONT_SIZE] = obj.getBoolean("volume_keys_font_size")
-            if (obj.has("swipe_action"))           p[Keys.SWIPE_ACTION] = obj.getInt("swipe_action").coerceIn(SWIPE_OFF, SWIPE_SESSION)
+            if (obj.has("swipe_action"))           p[Keys.SWIPE_ACTION] = obj.getInt("swipe_action").coerceIn(SWIPE_OFF, SWIPE_CUSTOM)
+            if (obj.has("swipe_custom_next"))      p[Keys.SWIPE_CUSTOM_NEXT] = obj.getString("swipe_custom_next")
+            if (obj.has("swipe_custom_prev"))      p[Keys.SWIPE_CUSTOM_PREV] = obj.getString("swipe_custom_prev")
             // Custom bars replace the local set (they carry their own ids); a selected id that
             // resolves to nothing falls back to the standard preset at read time.
             val customBars = obj.optJSONArray("extra_bar_custom")?.toString()

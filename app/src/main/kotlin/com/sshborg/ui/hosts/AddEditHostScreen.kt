@@ -62,6 +62,7 @@ fun AddEditHostScreen(
     val agentForwarding by vm.agentForwarding.collectAsState()
     val jumpHosts by vm.jumpHosts.collectAsState()
     val portForwardings by vm.portForwardings.collectAsState()
+    val postLoginCommand by vm.postLoginCommand.collectAsState()
     val jumpMode by vm.jumpMode.collectAsState()
     val jumpHostIds by vm.jumpHostIds.collectAsState()
     val availableJumpHosts by vm.availableJumpHosts.collectAsState()
@@ -575,6 +576,19 @@ fun AddEditHostScreen(
                 singleLine = false, minLines = 2,
                 placeholder = stringResource(R.string.host_port_forwarding_placeholder),
                 supporting = stringResource(R.string.host_port_forwarding_supporting),
+            )
+
+            HorizontalDivider()
+            Text(stringResource(R.string.host_section_post_login_command), style = MaterialTheme.typography.titleSmall)
+
+            HostField(
+                value = postLoginCommand,
+                onValueChange = { vm.postLoginCommand.value = it },
+                label = stringResource(R.string.host_field_post_login_command),
+                touchless = touchless,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                supporting = stringResource(R.string.host_field_post_login_command_supporting),
             )
 
             HorizontalDivider()

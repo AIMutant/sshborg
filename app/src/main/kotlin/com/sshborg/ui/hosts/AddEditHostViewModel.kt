@@ -69,6 +69,8 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
     var groupId = MutableStateFlow<Long?>(null)
     /** Optional per-host ARGB color; overrides the group color. */
     var hostColor = MutableStateFlow<Int?>(null)
+    /** Command sent to the shell automatically after login; blank = none. */
+    var postLoginCommand = MutableStateFlow("")
 
     /**
      * Whether a jump chain is configured, in whichever of the two modes is selected.
@@ -185,6 +187,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             moshCommand.value = h.moshCommand ?: ""
             groupId.value = h.groupId
             hostColor.value = h.color
+            postLoginCommand.value = h.postLoginCommand ?: ""
             _hasStoredHostKeys.value = h.knownHostsEntry != null || h.jumpHostKeys != null
             resetHostKeys.value = false
         }
@@ -267,6 +270,7 @@ class AddEditHostViewModel(app: Application) : AndroidViewModel(app) {
             moshCommand          = moshCommand.value.trim().takeIf { it.isNotEmpty() },
             groupId              = groupId.value,
             color                = hostColor.value,
+            postLoginCommand     = postLoginCommand.value.trim().takeIf { it.isNotEmpty() },
             // Not fields of this form, and `upsert` replaces the whole row — so leaving them out
             // did not mean "don't touch", it meant "set them back to the defaults". Saving an
             // edit therefore reset the most-used counter, forgot when the host was last connected

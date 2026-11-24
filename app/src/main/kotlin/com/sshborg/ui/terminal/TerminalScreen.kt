@@ -60,6 +60,7 @@ import com.sshborg.SshBorgApp
 import com.sshborg.isTelevision
 import com.sshborg.isTouchless
 import com.sshborg.data.AppPreferences
+import com.sshborg.data.unescapeKeyText
 import com.sshborg.service.SessionManager
 import com.sshborg.terminal.TerminalView
 import com.sshborg.data.ssh.MoshUnavailable
@@ -126,6 +127,8 @@ fun TerminalScreen(
     )
     val volumeKeysFontSize by app.appPreferences.volumeKeysFontSize.collectAsState(initial = true)
     val swipeAction by app.appPreferences.swipeAction.collectAsState(initial = AppPreferences.SWIPE_SCREEN_NEXT_PREV)
+    val swipeCustomNext by app.appPreferences.swipeCustomNext.collectAsState(initial = "\\x01n")
+    val swipeCustomPrev by app.appPreferences.swipeCustomPrev.collectAsState(initial = "\\x01p")
     val nightMode     by app.appPreferences.nightMode.collectAsState(
         initial = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     )
@@ -393,6 +396,8 @@ fun TerminalScreen(
                             view.doubleTapAction       = doubleTapAction
                             view.volumeKeysFontSize    = volumeKeysFontSize
                             view.swipeAction           = swipeAction
+                            view.swipeCustomNext       = unescapeKeyText(swipeCustomNext).toByteArray(Charsets.UTF_8)
+                            view.swipeCustomPrev       = unescapeKeyText(swipeCustomPrev).toByteArray(Charsets.UTF_8)
                             view.onSessionSwipe        = { dir -> switchSessionBySwipe(dir, sessionId, allShellSessions, onSwitchSession) }
                             view.keepScreenOn          = keepScreenOn
                             view.lightScheme           = terminalLight
@@ -412,6 +417,8 @@ fun TerminalScreen(
                         view.doubleTapAction       = doubleTapAction
                         view.volumeKeysFontSize    = volumeKeysFontSize
                         view.swipeAction           = swipeAction
+                        view.swipeCustomNext       = unescapeKeyText(swipeCustomNext).toByteArray(Charsets.UTF_8)
+                        view.swipeCustomPrev       = unescapeKeyText(swipeCustomPrev).toByteArray(Charsets.UTF_8)
                         view.onSessionSwipe        = { dir -> switchSessionBySwipe(dir, sessionId, allShellSessions, onSwitchSession) }
                         view.keepScreenOn          = keepScreenOn
                         view.lightScheme           = terminalLight

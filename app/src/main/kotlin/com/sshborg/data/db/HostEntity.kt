@@ -110,4 +110,10 @@ data class HostEntity(
      * wrong. The stock client has `--server=` for the same reason.
      */
     val moshCommand: String? = null,
+    /**
+     * A command sent to the shell automatically once the terminal is connected, followed by
+     * Enter. Null or blank = nothing. Useful for auto-starting tmux/screen or a monitoring
+     * command after login.
+     */
+    val postLoginCommand: String? = null,
 )

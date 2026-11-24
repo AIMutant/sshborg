@@ -90,7 +90,7 @@ class MigrationTest {
 
         // Runs every migration the app ships and then holds the result against the schema the
         // entities describe. Anything the migration forgot fails here.
-        val migrated = helper.runMigrationsAndValidate(NAME, 15, true, *AppDatabase.MIGRATIONS)
+        val migrated = helper.runMigrationsAndValidate(NAME, 16, true, *AppDatabase.MIGRATIONS)
 
         migrated.query(
             "SELECT label, hostname, port, position, connectCount, mosh, moshFamily, moshPorts, " +

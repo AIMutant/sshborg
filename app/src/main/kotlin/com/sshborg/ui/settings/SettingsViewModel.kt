@@ -239,6 +239,20 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch { prefs.setSwipeAction(action) }
     }
 
+    val swipeCustomNext: StateFlow<String> =
+        prefs.swipeCustomNext.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "\\x01n")
+
+    val swipeCustomPrev: StateFlow<String> =
+        prefs.swipeCustomPrev.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "\\x01p")
+
+    fun setSwipeCustomNext(s: String) {
+        viewModelScope.launch { prefs.setSwipeCustomNext(s) }
+    }
+
+    fun setSwipeCustomPrev(s: String) {
+        viewModelScope.launch { prefs.setSwipeCustomPrev(s) }
+    }
+
     fun setTerminalColorScheme(scheme: Int) {
         viewModelScope.launch { prefs.setTerminalColorScheme(scheme) }
     }
@@ -317,6 +331,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         if (h.moshFamily != "auto") put("moshFamily", h.moshFamily)
                         h.moshPorts?.let { put("moshPorts", it) }
                         h.moshCommand?.let { put("moshCommand", it) }
+                        h.postLoginCommand?.let { put("postLoginCommand", it) }
                         h.jumpHosts?.let { put("jumpHosts", it) }
                         h.jumpHostIdList?.let { put("jumpHostIdList", it) }
                         h.portForwardings?.let { put("portForwardings", it) }
@@ -332,7 +347,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     })
                 }
                 val json = JSONObject().apply {
-                    put("version", 10)
+                    put("version", 11)
                     put("exported_at", java.time.Instant.now().toString())
                     put("groups", groupsArr)
                     put("hosts", arr)
@@ -422,6 +437,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                         moshFamily = o.optString("moshFamily").takeIf { it.isNotEmpty() } ?: "auto",
                         moshPorts = o.optString("moshPorts").takeIf { it.isNotEmpty() },
                         moshCommand = o.optString("moshCommand").takeIf { it.isNotEmpty() },
+                        postLoginCommand = o.optString("postLoginCommand").takeIf { it.isNotEmpty() },
                         groupId = resolveGroupId(o.optString("group").takeIf { it.isNotEmpty() }),
                         color = if (o.has("color")) o.getInt("color") else null,
                         position = if (o.has("position")) o.getInt("position") else null,

@@ -144,6 +144,9 @@
     <string name="host_jump_no_password">Kein Passwort gespeichert</string>
     <string name="host_jump_mosh_password_unused">Gespeichertes Passwort wird ignoriert</string>
     <string name="host_section_port_forwarding">Port-Weiterleitung</string>
+    <string name="host_section_post_login_command">Befehl nach dem Login</string>
+    <string name="host_field_post_login_command">Befehl (optional)</string>
+    <string name="host_field_post_login_command_supporting">Wird nach dem Verbindungsaufbau automatisch mit Enter gesendet, z. B. tmux attach || tmux</string>
     <string name="host_field_port_forwarding">Weiterleitungsregeln (-L)</string>
     <string name="host_port_forwarding_placeholder">8080:localhost:8080\nbindAddr:8443:server:443</string>
     <string name="host_port_forwarding_supporting">Eine Regel pro Zeile: [lokalPort:remoteHost:remotePort] oder [bind:lokalPort:remoteHost:remotePort]. Optionales -L-Präfix.</string>
@@ -214,8 +217,14 @@
     <string name="settings_swipe_action_title">Aktion beim Wischen links/rechts</string>
     <string name="settings_swipe_action_subtitle">Was ein horizontaler Wisch im Terminal auslöst</string>
     <string name="settings_swipe_action_off">Nichts</string>
-    <string name="settings_swipe_action_screen">screen nächste/vorherige senden (Strg+A n / Strg+A p)</string>
+    <string name="settings_swipe_action_screen">screen: nächstes/vorheriges Fenster (Strg+A n / Strg+A p)</string>
+    <string name="settings_swipe_action_tmux">tmux: nächstes/vorheriges Fenster (Strg+B n / Strg+B p)</string>
     <string name="settings_swipe_action_session">Zur nächsten/vorherigen App-Sitzung wechseln</string>
+    <string name="settings_swipe_action_custom">Benutzerdefinierte Tastenfolgen</string>
+    <string name="settings_swipe_custom_keys_title">Benutzerdefinierte Wisch-Tasten</string>
+    <string name="settings_swipe_custom_keys_subtitle">Escapes: \\n \\t \\e \\\\ \\xHH (z. B. \\x01n = Strg+A n)</string>
+    <string name="settings_swipe_custom_next">Wisch nach links sendet</string>
+    <string name="settings_swipe_custom_prev">Wisch nach rechts sendet</string>
     <string name="settings_sftp_dirs_first_title">Ordner vor Dateien</string>
     <string name="settings_sftp_dirs_first_subtitle">Im SFTP-Browser Ordner vor Dateien auflisten</string>
     <string name="settings_double_tap_title">Doppeltipp-Aktion</string>

@@ -68,6 +68,18 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
     private val keyDao         = sshBorgApp.db.sshKeyDao()
     private val prefs          = sshBorgApp.appPreferences
 
+    private var postLoginSent = false
+
+    /** Sends the host's post-login command once per fresh connection, followed by Enter. */
+    private fun sendPostLoginCommand(hostId: Long) {
+        if (postLoginSent) return
+        postLoginSent = true
+        viewModelScope.launch {
+            val cmd = hostDao.getById(hostId)?.postLoginCommand?.takeIf { it.isNotBlank() } ?: return@launch
+            sendInput(cmd.toByteArray(Charsets.UTF_8) + byteArrayOf(0x0D))
+        }
+    }
+
     private var scrollbackLines = 2000
     init {
         viewModelScope.launch {
@@ -534,6 +546,7 @@ class TerminalViewModel(app: Application) : AndroidViewModel(app) {
                         }
                         _state.value = ConnectionState.Connected
                     }
+                    sendPostLoginCommand(hostId)
                     val dialled = hostDao.getById(target.id) ?: target
                     val pinned = KnownHosts.replacing(dialled.knownHostsEntry, session.hostKeyLine)
                     if (pinned != dialled.knownHostsEntry)

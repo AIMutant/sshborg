@@ -116,6 +116,14 @@ fun unescapeKeyText(s: String): String {
                 't'  -> { out.append('\t'); i += 2; continue }
                 'e'  -> { out.append(''); i += 2; continue }
                 '\\' -> { out.append('\\'); i += 2; continue }
+                'x'  -> {
+                    // \xHH hex escape (e.g. \x01 for Ctrl+A, \x02 for Ctrl+B)
+                    if (i + 3 < s.length) {
+                        val v = s.substring(i + 2, i + 4).toIntOrNull(16)
+                        if (v != null && v in 0..255) { out.append(v.toChar()); i += 4; continue }
+                    }
+                    out.append(c); i++
+                }
             }
         }
         out.append(c); i++

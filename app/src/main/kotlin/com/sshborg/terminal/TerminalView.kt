@@ -90,6 +90,10 @@ class TerminalView @JvmOverloads constructor(
     /** What a horizontal swipe on the terminal does: one of AppPreferences.SWIPE_*. */
     var swipeAction: Int = AppPreferences.SWIPE_SCREEN_NEXT_PREV
 
+    /** Key sequences for [AppPreferences.SWIPE_CUSTOM], decoded from the settings strings. */
+    var swipeCustomNext: ByteArray = byteArrayOf(0x01, 'n'.code.toByte())
+    var swipeCustomPrev: ByteArray = byteArrayOf(0x01, 'p'.code.toByte())
+
     /** Called with +1 for a rightward fling, -1 for a leftward one. */
     var onSessionSwipe: ((Int) -> Unit)? = null
 
@@ -847,6 +851,11 @@ class TerminalView @JvmOverloads constructor(
             AppPreferences.SWIPE_SCREEN_NEXT_PREV ->
                 // GNU screen: Ctrl+A then n (next window) / p (previous window).
                 emitInput(if (dir < 0) byteArrayOf(0x01, 'n'.code.toByte()) else byteArrayOf(0x01, 'p'.code.toByte()))
+            AppPreferences.SWIPE_TMUX_NEXT_PREV ->
+                // tmux default prefix Ctrl+B, then n (next window) / p (previous window).
+                emitInput(if (dir < 0) byteArrayOf(0x02, 'n'.code.toByte()) else byteArrayOf(0x02, 'p'.code.toByte()))
+            AppPreferences.SWIPE_CUSTOM ->
+                emitInput(if (dir < 0) swipeCustomNext else swipeCustomPrev)
             else -> {}
         }
     }

@@ -83,6 +83,8 @@ fun SettingsScreen(
     val doubleTapAction       by vm.doubleTapAction.collectAsState()
     val volumeKeysFontSize    by vm.volumeKeysFontSize.collectAsState()
     val swipeAction           by vm.swipeAction.collectAsState()
+    val swipeCustomNext       by vm.swipeCustomNext.collectAsState()
+    val swipeCustomPrev       by vm.swipeCustomPrev.collectAsState()
     val historySuggestions    by vm.historySuggestions.collectAsState()
     val suggestionsBarSticky  by vm.suggestionsBarSticky.collectAsState()
     val extraKeysBarPinned    by vm.extraKeysBarPinned.collectAsState()
@@ -327,7 +329,9 @@ fun SettingsScreen(
             val swipeOptions = listOf(
                 AppPreferences.SWIPE_OFF to stringResource(R.string.settings_swipe_action_off),
                 AppPreferences.SWIPE_SCREEN_NEXT_PREV to stringResource(R.string.settings_swipe_action_screen),
+                AppPreferences.SWIPE_TMUX_NEXT_PREV to stringResource(R.string.settings_swipe_action_tmux),
                 AppPreferences.SWIPE_SESSION to stringResource(R.string.settings_swipe_action_session),
+                AppPreferences.SWIPE_CUSTOM to stringResource(R.string.settings_swipe_action_custom),
             )
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_swipe_action_title)) },
@@ -342,6 +346,33 @@ fun SettingsScreen(
                     )
                 },
             )
+
+            // Custom swipe key sequences, only meaningful for the "custom" action
+            if (swipeAction == AppPreferences.SWIPE_CUSTOM) {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_swipe_custom_keys_title)) },
+                    supportingContent = { Text(stringResource(R.string.settings_swipe_custom_keys_subtitle)) },
+                    trailingContent = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = swipeCustomNext,
+                                onValueChange = { vm.setSwipeCustomNext(it) },
+                                modifier = Modifier.width(90.dp),
+                                singleLine = true,
+                                label = { Text(stringResource(R.string.settings_swipe_custom_next)) },
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            OutlinedTextField(
+                                value = swipeCustomPrev,
+                                onValueChange = { vm.setSwipeCustomPrev(it) },
+                                modifier = Modifier.width(90.dp),
+                                singleLine = true,
+                                label = { Text(stringResource(R.string.settings_swipe_custom_prev)) },
+                            )
+                        }
+                    },
+                )
+            }
 
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_keep_screen_on_title)) },
