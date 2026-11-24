@@ -4,6 +4,8 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   apk:
     runs-on: ubuntu-latest
+    # The ubuntu-latest runner image already ships ANDROID_HOME with
+    # platforms;android-37 and build-tools;37.0.0 - no SDK setup needed.
     steps:
       - uses: actions/checkout@v4
 
@@ -11,17 +13,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-
-      - name: Set up Android SDK
-        run: |
-          export ANDROID_HOME="$RUNNER_TEMP/android-sdk"
-          sudo apt-get update -y && sudo apt-get install -y unzip
-          mkdir -p "$ANDROID_HOME/cmdline-tools"
-          curl -fsSL -o /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
-          unzip -q /tmp/cmdtools.zip -d "$ANDROID_HOME/cmdline-tools"
-          mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37" "platform-tools"
 
       - name: Build debug APK
         run: |
